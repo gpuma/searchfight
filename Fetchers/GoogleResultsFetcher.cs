@@ -7,10 +7,12 @@ namespace searchfight
 {
     class GoogleResultsFetcher : IResultsFetcher
     {
+        public string Name { get { return "Google"; } }
+
         public async Task<long> GetNumberOfResults(string query)
         {
             var contents = await new HttpRequestFetcher()
-                            .FetchContentsAsString($"https://www.google.com.pe/search?q={query}");
+                .FetchContentsAsString($"https://www.google.com.pe/search?q={Util.preprocessQuery(query)}");
             return this.ParseNumberOfResults(contents);
         }
 
