@@ -8,7 +8,12 @@ namespace searchfight
     //another alternative would be to use the Bing API
     class BingResultsFetcher : IResultsFetcher
     {
-        public string Name { get { return "Bing"; } }
+        public string Name { get; set; }
+
+        public BingResultsFetcher(string name)
+        {
+            Name = name;
+        }
 
         public async Task<long> GetNumberOfResults(string query)
         {

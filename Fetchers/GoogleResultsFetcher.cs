@@ -7,7 +7,12 @@ namespace searchfight
 {
     class GoogleResultsFetcher : IResultsFetcher
     {
-        public string Name { get { return "Google"; } }
+        public string Name { get; set; }
+
+        public GoogleResultsFetcher(string name)
+        {
+            Name = name;
+        }
 
         public async Task<long> GetNumberOfResults(string query)
         {
