@@ -9,73 +9,76 @@ namespace searchfight
     class ResultsComparer
     {
         IResultsFetcher[] Fetchers { get; set; }
-        
+
         //array of tuples (C# 7)
         //name of fetcher, name of winner query term, number of results for winner query
         (string, string, long)[] winners;
         (string, string, long) totalWinner;
         long[,] resultsMatrix;
-        string[] queries;
+        string[] Queries { get; set; }
 
         public ResultsComparer(IResultsFetcher[] fetchers, string[] queries)
         {
             Fetchers = fetchers;
             var foundDuplicates = fetchers.GroupBy(x => x.Name).Any(x => x.Count() > 1);
-            if(foundDuplicates)
+            if (foundDuplicates)
             {
                 throw new InvalidOperationException("Fetchers must have different names.");
             }
-            winners = new (string, string, long)[fetchers.Length];
-            this.queries = queries;
+            winners = new(string, string, long)[fetchers.Length];
         }
-        
-        public void Compare()
+
+        public void Compare(string[] queries)
         {
-            resultsMatrix = new long[Fetchers.Length, queries.Length];
-            for(int i=0;i<Fetchers.Length;i++)
+            this.Queries = queries;
+            resultsMatrix = new long[Fetchers.Length, Queries.Length];
+            
+            //rows: fetchers
+            //columns: queries
+            for (int i = 0; i < Fetchers.Length; i++)
             {
                 long maxValue = -1;
                 var maxQueryIndex = -1;
-                for(int j=0;j<queries.Length;j++)
+                for (int j = 0; j < Queries.Length; j++)
                 {
-                    //blocking call since we need for the program
-                    //to wait on this process
-                    var task = Fetchers[i].GetNumberOfResults(queries[j]);
+                    //blocking call since we need to wait
+                    //for all the results in order to determine the winner
+                    var task = Fetchers[i].GetNumberOfResults(Queries[j]);
                     task.Wait();
+                    resultsMatrix[i, j] = task.Result;
                     
-                    resultsMatrix[i,j] = task.Result;
-                    if(resultsMatrix[i,j]>maxValue)
+                    if (resultsMatrix[i, j] > maxValue)
                     {
-                        maxValue = resultsMatrix[i,j];
+                        maxValue = resultsMatrix[i, j];
                         maxQueryIndex = j;
                     }
                 }
-                winners[i]=(Fetchers[i].Name, queries[maxQueryIndex], maxValue);
+                winners[i] = (Fetchers[i].Name, Queries[maxQueryIndex], maxValue);
             }
 
             //total winner
             totalWinner = (from w in winners
-                            orderby w.Item3 descending
-                            select w).FirstOrDefault();
+                           orderby w.Item3 descending
+                           select w).FirstOrDefault();
         }
 
-        public void DisplayResults()
+        public string GetResultsAsString()
         {
             var strBuilder = new StringBuilder();
-            
+
             //results by query
-            for(int j=0;j<resultsMatrix.GetLength(1);j++)
+            for (int j = 0; j < resultsMatrix.GetLength(1); j++)
             {
-                strBuilder.Append($"{queries[j]}: ");
-                for(int i=0;i<resultsMatrix.GetLength(0);i++)
+                strBuilder.Append($"{Queries[j]}: ");
+                for (int i = 0; i < resultsMatrix.GetLength(0); i++)
                 {
-                    strBuilder.Append($"{Fetchers[i].Name}: {resultsMatrix[i,j]}, ");
+                    strBuilder.Append($"{Fetchers[i].Name}: {resultsMatrix[i, j]}, ");
                 }
                 strBuilder.Append(Environment.NewLine);
             }
 
             //winners
-            foreach(var win in winners)
+            foreach (var win in winners)
             {
                 strBuilder.Append($"{win.Item1} winner: {win.Item2}{Environment.NewLine}");
             }
@@ -83,8 +86,7 @@ namespace searchfight
             //final winner
             strBuilder.Append($"Total winner: {totalWinner.Item2}");
 
-            //TODOV: return instead of writing here
-            Console.Write(strBuilder.ToString());
+            return strBuilder.ToString();
         }
     }
 }

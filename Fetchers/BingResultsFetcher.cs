@@ -25,12 +25,12 @@ namespace searchfight
         public long ParseNumberOfResults(string contents)
         {
             var pattern = @"(\d{1,3}(.\d{3})*(\.\d+)?) result\w+";
-            var results = Regex.Match(contents,pattern);
-            if(!results.Success)
+            var results = Regex.Match(contents, pattern);
+            if (!results.Success)
             {
                 throw new NotSupportedException("Unable to find a match.");
             }
-            
+
             //results[0] -> the full match
             //results[1] -> the first group (the one we want)
             var dotSeparatedResult = results.Groups[1].Value.ToString();

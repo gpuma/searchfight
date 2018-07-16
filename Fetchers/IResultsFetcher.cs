@@ -5,7 +5,7 @@ namespace searchfight
 {
     interface IResultsFetcher
     {
-        string Name { get; }
+        string Name { get; set; }
         Task<long> GetNumberOfResults(string query);
     }
 }

@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace searchfight
 {
+    /// <summary>
+    /// Mock class for testing the ResultsComparer
+    /// </summary>
     class MockResultsFetcher : IResultsFetcher
     {
         public string Name { get; set; }
@@ -18,7 +21,7 @@ namespace searchfight
         public Task<long> GetNumberOfResults(string query)
         {
             long result;
-            if(count == 0)
+            if (count == 0)
                 result = 10000;
             else if (count == 1)
                 result = 500;
