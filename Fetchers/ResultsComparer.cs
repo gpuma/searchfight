@@ -29,7 +29,7 @@ namespace searchfight
             this.queries = queries;
         }
         
-        public async void Compare()
+        public void Compare()
         {
             resultsMatrix = new long[Fetchers.Length, queries.Length];
             for(int i=0;i<Fetchers.Length;i++)
@@ -69,7 +69,7 @@ namespace searchfight
                 strBuilder.Append($"{queries[j]}: ");
                 for(int i=0;i<resultsMatrix.GetLength(0);i++)
                 {
-                    strBuilder.Append($"{Fetchers[i].Name}: {resultsMatrix[i,j]} ");
+                    strBuilder.Append($"{Fetchers[i].Name}: {resultsMatrix[i,j]}, ");
                 }
                 strBuilder.Append(Environment.NewLine);
             }

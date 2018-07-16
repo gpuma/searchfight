@@ -7,6 +7,5 @@ namespace searchfight
     {
         string Name { get; }
         Task<long> GetNumberOfResults(string query);
-        long ParseNumberOfResults(string contents);
     }
 }

@@ -23,7 +23,10 @@ namespace searchfight
             // //     Console.WriteLine(a);
             // // }
 
-            IResultsFetcher[] fetchers = {new GoogleResultsFetcher("Google search"), new BingResultsFetcher("Bing search")};
+            IResultsFetcher[] fetchers = {
+                new GoogleResultsFetcher("Google search"),
+                new BingResultsFetcher("Bing search"),
+                new MockResultsFetcher("Mock search")};
             var comparer = new ResultsComparer(fetchers, args);
             comparer.Compare();
             comparer.DisplayResults();
